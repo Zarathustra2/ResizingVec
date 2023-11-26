@@ -2,6 +2,8 @@
 name = "resizing-vec"
 version = "0.1.0"
 edition = "2021"
+description = "An automatic resizing vector for data with linear increasing ids"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

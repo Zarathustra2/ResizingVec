@@ -1,8 +1,13 @@
-use std::iter::repeat_with;
+use std::{
+    iter::repeat_with,
+    ops::{Index, IndexMut},
+};
 
 #[derive(Debug)]
 pub struct ResizingVec<T> {
     vec: Vec<Option<T>>,
+    /// The amount of positions in `vec`
+    /// that have active (Some(_) values)
     active: usize,
 }
 
@@ -10,8 +15,22 @@ impl<T: Clone> Clone for ResizingVec<T> {
     fn clone(&self) -> Self {
         Self {
             vec: self.vec.clone(),
-            active: self.active.clone(),
+            active: self.active,
         }
+    }
+}
+
+impl<T> Index<usize> for ResizingVec<T> {
+    type Output = Option<T>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.vec[index]
+    }
+}
+
+impl<T> IndexMut<usize> for ResizingVec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.vec[index]
     }
 }
 
@@ -55,6 +74,7 @@ impl<T> ResizingVec<T> {
         }
     }
 
+    // TODO: Use traits
     pub fn iter(&self) -> impl Iterator<Item = (usize, &T)> + '_ {
         self.vec
             .iter()
@@ -103,14 +123,14 @@ impl<T> ResizingVec<T> {
 
     pub fn resize(&mut self) -> Vec<Position> {
         let vec = Vec::with_capacity(self.active);
-        let mut resizing_res = Vec::with_capacity(self.active);
+        let mut positions = Vec::with_capacity(self.active);
 
         let prev = std::mem::replace(&mut self.vec, vec);
 
         for (idx, elem) in prev.into_iter().enumerate() {
             if elem.is_some() {
                 self.vec.push(elem);
-                resizing_res.push(Position {
+                positions.push(Position {
                     prev_idx: idx,
                     new_idx: self.vec.len() - 1,
                 });
@@ -119,7 +139,7 @@ impl<T> ResizingVec<T> {
 
         self.active = self.vec.len();
 
-        resizing_res
+        positions
     }
 }
 
