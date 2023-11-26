@@ -18,7 +18,6 @@ Now when you insert an item with the index `5`.
 let mut r_vec = ResizingVec::new();
 r_vec.insert(5, "6th elem".to_string());
 println("{:?}", r_vec);
-// Will print:
 // ResizingVec { vec: [None, None, None, None, None, Some("5th elem")], active: 1 }
 ```
 Since the element got inserted at the 5th index but prior to inserting no other elements existed the vector got filled with `None` values for the indicies 0-4. 
@@ -67,9 +66,9 @@ printlnt!("{} is trading at {}$", full_name, price.last);
 ```
 
 ----
-Another application is that some financial data providers do not send the ticker/option contract for every trade/nbbo but rather send you an id identifier. 
+Another application is that some financial data providers do not send the ticker/option contract for every trade/nbbo but rather send you an identifier. 
 
-So in the morning you get for every ticker a message such as:
+In the morning you get for every ticker(instrument) a message such as:
 ```
 ticker: AAPL, locate: 10, channel: 5
 ```
@@ -84,7 +83,7 @@ Now when you get a trade execution:
 ```
 channel: 5, locate: 10, size: 10, price: 120
 ```
-then you can do:
+you can find the corresponding ticker via:
 ```rust
 let ticker = channel_five[msg.channel];
 println!("{} {} @ ${}", ticker, msg.size, msg.price);

@@ -1,9 +1,9 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use resizing_vec::ResizingVec;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::fs::File;
 use std::hash::Hash;
-use std::io::{self, prelude::*, BufReader};
+use std::io::{prelude::*, BufReader};
 
 fn criterion_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("ChainAccess");
@@ -12,25 +12,21 @@ fn criterion_benchmark(c: &mut Criterion) {
     let root_hs = setup_hs();
 
     let upper = black_box(3);
-    for locate in (0..upper) {
+    for locate in 0..upper {
         group.bench_with_input(
-            BenchmarkId::new("ResizingVec", &locate),
+            BenchmarkId::new("ResizingVec", locate),
             &locate,
             |b, locate| {
-                for channel in (0..upper) {
+                for channel in 0..upper {
                     b.iter(|| root_rv.get(channel, *locate))
                 }
             },
         );
-        group.bench_with_input(
-            BenchmarkId::new("HashSet", &locate),
-            &locate,
-            |b, locate| {
-                for channel in (0..upper) {
-                    b.iter(|| root_hs.get(channel, *locate))
-                }
-            },
-        );
+        group.bench_with_input(BenchmarkId::new("HashSet", locate), &locate, |b, locate| {
+            for channel in 0..upper {
+                b.iter(|| root_hs.get(channel, *locate))
+            }
+        });
     }
 }
 
@@ -38,7 +34,6 @@ fn criterion_benchmark(c: &mut Criterion) {
 struct LocateId(pub usize, pub usize);
 
 pub struct Chain {
-    sym: String,
     channel: usize,
     locate: usize,
     hash_id: LocateId,
@@ -77,10 +72,9 @@ fn base_setup() -> Vec<Chain> {
         }
 
         let line = line.unwrap();
-        let splits = line.split(",").collect::<Vec<&str>>();
+        let splits = line.split(',').collect::<Vec<&str>>();
 
         v.push(Chain {
-            sym: splits[0].to_string(),
             channel: splits[1].parse().unwrap(),
             locate: splits[2].parse().unwrap(),
             hash_id: LocateId(splits[1].parse().unwrap(), splits[2].parse().unwrap()),

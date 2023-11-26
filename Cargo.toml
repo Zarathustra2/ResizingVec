@@ -1,6 +1,7 @@
 [package]
 name = "resizing-vec"
-version = "0.1.0"
+version = "0.1.2"
+authors = ["Dario <dario.heinisch@gmail.com>"]
 edition = "2021"
 description = "An automatic resizing vector for data with linear increasing ids"
 license = "MIT"
