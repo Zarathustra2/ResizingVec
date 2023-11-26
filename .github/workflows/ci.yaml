@@ -35,4 +35,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --tests -Dclippy::all
+          args: --tests -- -Dclippy::all
