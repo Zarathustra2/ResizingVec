@@ -15,9 +15,10 @@ struct ResizingVec<T> {
 
 Now when you insert an item with the index `5`.
 ```rust
+use resizing_vec::ResizingVec;
+
 let mut r_vec = ResizingVec::new();
 r_vec.insert(5, "6th elem".to_string());
-println("{:?}", r_vec);
 // ResizingVec { vec: [None, None, None, None, None, Some("5th elem")], active: 1 }
 ```
 Since the element got inserted at the 5th index but prior to inserting no other elements existed the vector got filled with `None` values for the indicies 0-4. 
@@ -30,6 +31,9 @@ This can be used for data with unique integer ids and having to rely on fast rea
 This can could be used for financial data for instance:
 
 ```rust
+use resizing_vec::ResizingVec;
+use std::collections::HashMap;
+
 struct IdAssigner {
 	map: HashMap<String, usize>,
 }
@@ -50,7 +54,7 @@ impl IdAssigner {
 
 struct Price {
 	ticker: String,
-	last: Decimal
+	last: usize
 }
 
 let mut id_assigner = IdAssigner::new();
@@ -60,31 +64,34 @@ let id = id_assigner.get("INTC");
 r_vec.insert(id, "INTEL CORP");
 
 // Now that we have a unique id for every ticker we can use that to easily info about each ticker and enrich our price data quickly with it.
-let price = Price {ticker: "INTC".to_string(), last: dec!(52)};
+let price = Price {ticker: "INTC".to_string(), last: 52};
 let full_name = r_vec[id];
-printlnt!("{} is trading at {}$", full_name, price.last);
+// println!("{} is trading at {}$", full_name, price.last);
 ```
 
 ----
-Another application is that some financial data providers do not send the ticker/option contract for every trade/nbbo but rather send you an identifier. 
+Another application is that some financial data providers do not send the ticker/option contract for every trade/nbbo but rather send you an identifier once in the morning which will resemeble the ticker/contract through out the day. Each locate is unique per channel:
+> ticker: AAPL, locate: 10, channel: 5
 
-In the morning you get for every ticker(instrument) a message such as:
-```
-ticker: AAPL, locate: 10, channel: 5
-```
-Each locate is unique per channel so you could create the following `ResizingVec`:
-
-```rust
-let mut channel_five = ResizingVec::new();
-channel_five.insert(5, "AAPL".to_string());
-```
 
 Now when you get a trade execution:
-```
-channel: 5, locate: 10, size: 10, price: 120
-```
+> channel: 5, locate: 10, size: 10, price: 120
+
 you can find the corresponding ticker via:
 ```rust
-let ticker = channel_five[msg.channel];
-println!("{} {} @ ${}", ticker, msg.size, msg.price);
+struct Trade {
+	channel: usize,
+	size: usize,
+	price: usize
+}
+
+// Initialize in the morning
+use resizing_vec::ResizingVec;
+let mut channel_five = ResizingVec::new();
+channel_five.insert(5, "AAPL".to_string());
+
+// When you get a trade execution
+let trade = Trade {channel: 5, size: 100, price: 120};
+let ticker = channel_five.get(trade.channel).unwrap();
+println!("{} {} @ ${}", ticker, trade.size, trade.price);
 ```
