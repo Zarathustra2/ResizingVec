@@ -5,7 +5,7 @@
 -  each data has a unique integer id
 -  the ids (numbers) are clustered
 
-The underlying data structured looks as following:
+The underlying data structures is as follows:
 ```rust
 struct ResizingVec<T> {
     vec: Vec<Option<T>>,
@@ -13,7 +13,7 @@ struct ResizingVec<T> {
 }
 ```
 
-Now when you insert an item with the index `5`.
+Inserting an item with the index `5`
 ```rust
 use resizing_vec::ResizingVec;
 
@@ -23,7 +23,7 @@ r_vec.insert(5, "6th elem".to_string());
 ```
 Since the element got inserted at the 5th index but prior to inserting no other elements existed the vector got filled with `None` values for the indicies 0-4. 
 
-The time complexity of an insert operation is as an result depending on whether the vector has to resize or not. 
+The time complexity of an insert operation is as a result depending on whether the vector has to resize or not. 
 
 ## Use cases
 This can be used for data with unique integer ids and having to rely on fast read operations. 
@@ -88,10 +88,10 @@ struct Trade {
 // Initialize in the morning
 use resizing_vec::ResizingVec;
 let mut channel_five = ResizingVec::new();
-channel_five.insert(5, "AAPL".to_string());
+channel_five.insert(10, "AAPL".to_string());
 
 // When you get a trade execution
-let trade = Trade {channel: 5, size: 100, price: 120};
+let trade = Trade {channel: 10, size: 100, price: 120};
 let ticker = channel_five.get(trade.channel).unwrap();
 println!("{} {} @ ${}", ticker, trade.size, trade.price);
 ```
